@@ -1,0 +1,28 @@
+# Stage 1: Build
+FROM node:18-alpine as build
+WORKDIR /app
+
+# Install dependencies (Using npm install to avoid lockfile errors)
+COPY package*.json ./
+RUN npm install
+
+# Build the app
+COPY . .
+RUN npm run build --prod
+
+# --- THE FIX ---
+# 1. List files to debug (in case build failed silently)
+RUN ls -R /app/dist
+
+# 2. Rename the internal folder (whatever it is) to 'build-out'
+# This handles "angular-15-crud", "browser", or any other name automatically.
+RUN cd /app/dist && mv "$(ls -A | head -n 1)" build-out
+# ---------------
+
+# Stage 2: Serve
+FROM nginx:stable-alpine
+# Copy the renamed folder
+COPY --from=build /app/dist/build-out /usr/share/nginx/html
+
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
