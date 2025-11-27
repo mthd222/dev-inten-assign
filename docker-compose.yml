@@ -15,7 +15,7 @@ services:
     build: ./backend
     image: 675711/mean-backend:latest
     container_name: mean-backend
-    restart: unless-stopped
+    restart: always
     depends_on:
       - mongo
     environment:
