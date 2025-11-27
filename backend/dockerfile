@@ -1,15 +1,18 @@
-FROM node:18-alpine AS builder
+# Use Node.js 18
+FROM node:18-alpine
+
+# Set working directory
 WORKDIR /app
+
+# Install dependencies
 COPY package*.json ./
 RUN npm install
+
+# Copy source code
 COPY . .
 
-
-FROM node:18-alpine
-WORKDIR /app
-ENV NODE_ENV=production
-COPY --from=builder /app ./
-
+# Expose the API port
 EXPOSE 3000
-CMD ["node", "server.js"]
 
+# Start the server
+CMD ["node", "server.js"]
