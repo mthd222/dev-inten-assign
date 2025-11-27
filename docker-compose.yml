@@ -7,7 +7,7 @@ services:
     volumes:
       - mongo-data:/data/db
     environment:
-      MONGO_INITDB_DATABASE: myappdb
+      MONGO_INITDB_DATABASE: dd-db
     ports:
       - "27017:27017"
 
@@ -19,7 +19,7 @@ services:
     depends_on:
       - mongo
     environment:
-      - MONGO_URI=mongodb://mongo:27017/myappdb
+      - MONGO_URI=mongodb://mongo:27017/dd-db
       - PORT=3000
     ports:
       - "3000:3000"
