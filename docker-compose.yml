@@ -1,0 +1,61 @@
+version: "3.8"
+services:
+  mongo:
+    image: mongo:6.0
+    container_name: mongo
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: myappdb
+    ports:
+      - "27017:27017"
+
+  backend:
+    build: ./backend
+    image: 675711/mean-backend:latest
+    container_name: mean-backend
+    restart: unless-stopped
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/myappdb
+      - PORT=3000
+    ports:
+      - "3000:3000"
+    networks:
+      - mean-network
+
+  frontend:
+    build: ./frontend
+    image: 675711/mean-frontend:latest
+    container_name: mean-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    networks:
+      - mean-network
+    ports:
+      - "8080:80" # optional mapping; nginx will serve on 80 externally
+
+  nginx:
+    image: nginx:stable-alpine
+    container_name: mean-nginx
+    restart: unless-stopped
+    depends_on:
+      - frontend
+      - backend
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "80:80"
+    networks:
+      - mean-network
+
+volumes:
+  mongo-data:
+
+networks:
+  mean-network:
+    driver: bridge
+
