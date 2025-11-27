@@ -19,9 +19,16 @@ RUN ls -R /app/dist
 RUN cd /app/dist && mv "$(ls -A | head -n 1)" build-out
 # ---------------
 
-# Stage 2: Serve
+# ... (rest of file)
 FROM nginx:stable-alpine
-# Copy the renamed folder
+
+# Remove default config
+RUN rm /etc/nginx/conf.d/default.conf
+
+# Copy our custom config
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Copy the build output (Keep your existing line here)
 COPY --from=build /app/dist/build-out /usr/share/nginx/html
 
 EXPOSE 80
