@@ -1,79 +1,106 @@
-# MEAN CRUD App — Containerized Deployment (Docker / Docker Compose / Nginx / GitHub Actions CI-CD)
+# MEAN CRUD Application — Dockerized Deployment with CI/CD & Nginx Reverse Proxy
 
-**Project:** crud-dd-task-mean-app  
-**Author:** Milan Tej H D
-**Date:** 28-Nov-2025
+This repository contains a fully containerized **MEAN Stack (MongoDB, Express, Angular, Node.js)** CRUD application, along with a complete **DevOps deployment pipeline** using:
+
+- **Docker**
+- **Docker Compose**
+- **Nginx Reverse Proxy**
+- **GitHub Actions (CI/CD)**
+- **AWS EC2 Ubuntu VM**
+
+The application allows users to create, update, delete, and search tutorials.  
+The entire stack runs using Docker Compose, and GitHub Actions automates build → push → deploy.
 
 ---
 
-## Overview
+# 📁 Project Structure
 
-This repository contains a containerized MEAN stack (MongoDB / Express / Angular / Node.js) application and full CI/CD pipeline that builds Docker images, pushes them to Docker Hub, and deploys the application to an Ubuntu VM using Docker Compose. Nginx is used as a reverse proxy to expose the application on port **80**.
-
----
-
-## Repository Structure
-
-├── backend/
+crud-dd-task-mean-app/
+│
+├── backend/ # Node.js + Express API
+│ ├── Dockerfile
 │ ├── package.json
 │ ├── server.js
-│ └── ... (backend source)
-├── frontend/
+│ └── ...
+│
+├── frontend/ # Angular application
+│ ├── Dockerfile
 │ ├── package.json
 │ ├── src/
-│ └── ... (Angular source)
+│ └── ...
+│
 ├── nginx/
-│ └── default.conf
-├── Dockerfile.backend
-├── Dockerfile.frontend
-├── docker-compose.yml
+│ ├── default.conf # Reverse proxy config
+│
+├── docker-compose.yml # Full stack deployment
+│
 ├── .github/
-│ └── workflows/ci-cd.yml
-└── README.md
+│ └── workflows/
+│ └── ci-cd.yml # GitHub Actions pipeline
+│
+├── README.md # Documentation (this file)
 
+# Docker Architecture
 
+### Services used:
+| Service     | Description |
+|-------------|-------------|
+| **mongo**   | MongoDB database (official image) |
+| **backend** | Express API (Node.js) |
+| **frontend** | Angular UI served via nginx |
+| **nginx** | Reverse proxy routing UI + API |
 
-> Note: The repo contains both Dockerfiles, docker-compose, and the GitHub Actions workflow required for CI/CD.
+### 📌 Backend reachable only via Nginx  
+Angular **never directly talks to port 3000**. 
+Instead, it calls:
+/api/tutorials
 
----
+Nginx proxies this to the backend.
 
-## Prerequisites
+# Docker Compose (Multi-Container Deployment)
+The `docker-compose.yml` spins up:
+- MongoDB 
+- Backend REST API 
+- Angular frontend 
+- Nginx reverse proxy (serves frontend + backend) 
 
-- GitHub account.
-- Docker Hub account (username: `YOUR_DOCKERHUB_USER`).
-- AWS EC2 Ubuntu VM (or similar) reachable via SSH.
-- GitHub repo secrets configured:
-  - `DOCKERHUB_USERNAME`
-  - `DOCKERHUB_TOKEN` (Docker Hub access token or password)
-  - `VM_HOST` (public IP or DNS of VM)
-  - `VM_USER` (deploy user)
-  - `VM_SSH_KEY` (private key contents, newline-encoded)
-  - `DOCKERHUB_REPO_FRONTEND` (e.g. `youruser/mean-frontend`)
-  - `DOCKERHUB_REPO_BACKEND` (e.g. `youruser/mean-backend`)
+To run locally:
+docker compose up -d --build
 
----
+Access website:
+http://localhost/
 
-## Files to review / edit
+CI/CD Pipeline (GitHub Actions)
 
-- `nginx/default.conf` — reverse proxy config
-- `docker-compose.yml` — compose file for VM deploy
-- `frontend/src/app/services/tutorial.service.ts` — ensure `baseUrl = '/api/tutorials'`
-- `backend/server.js` — ensure `/health` endpoint exists (snippet below)
-- `.github/workflows/ci-cd.yml` — CI/CD pipeline
+This project includes a full CI/CD pipeline at:
+.github/workflows/ci-cd.yml
+Pipeline Steps:
+Checkout code
+Build Docker images
+frontend → YOUR_DOCKERHUB_USER/mean-frontend:latest
+backend → YOUR_DOCKERHUB_USER/mean-backend:latest
+Push images to Docker Hub
+VM HOST public ip address
+SSH into AWS VM
+Pull latest images
+Restart containers via Docker Compose
+On every push to main branch
 
----
+AWS Deployment Guide
+1. Launch EC2 Server
+Ubuntu 22.04
+Open ports:
+22 (SSH)
+80 (HTTP)
 
-## How to push this repo to GitHub
+2. Install Docker & Compose
+sudo apt update -y
+sudo apt install -y docker.io docker-compose-plugin
+sudo usermod -aG docker ubuntu
+newgrp docker
 
-From project root:
+3. Deploy
+docker compose up -d --build
 
-```bash
-git init
-git add .
-git commit -m "Initial commit - MEAN app containerized + CI-CD"
-# create repo on GitHub via UI or gh cli:
-# gh repo create YOUR_GITHUB_USER/crud-dd-task-mean-app --public --confirm
-git remote add origin git@github.com:YOUR_GITHUB_USER/crud-dd-task-mean-app.git
-git branch -M main
-git push -u origin main
-
+4. Visit website
+http://YOUR_PUBLIC_IP/
