@@ -39,7 +39,7 @@ crud-dd-task-mean-app/
 │
 ├── docker-compose.yml         # Orchestrates Backend, Frontend, and Database
 └── README.md                  # Project documentation
-
+```
 # Docker Architecture
 
 ### Services used:
