@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Tutorial } from '../models/tutorial.model';
 
-const baseUrl = 'http://65.2.142.90:3000/tutorials';
+const baseUrl = '/api/tutorials';   // IMPORTANT: use Nginx reverse proxy path
 
 @Injectable({
   providedIn: 'root'
@@ -40,3 +40,4 @@ export class TutorialService {
     return this.http.get<Tutorial[]>(`${baseUrl}?title=${title}`);
   }
 }
+

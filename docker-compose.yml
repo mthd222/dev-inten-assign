@@ -1,4 +1,5 @@
 version: "3.8"
+
 services:
   mongo:
     image: mongo:6.0
@@ -8,8 +9,17 @@ services:
       - mongo-data:/data/db
     environment:
       MONGO_INITDB_DATABASE: dd-db
+      # If you want authentication, uncomment and set these:
+      # MONGO_INITDB_ROOT_USERNAME: root
+      # MONGO_INITDB_ROOT_PASSWORD: examplepassword
     ports:
-      - "27017:27017"
+      - "27017:27017"   # remove this in production if you don't want host exposure
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.getMongo() && db.getName()"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   backend:
     build: ./backend
@@ -17,14 +27,22 @@ services:
     container_name: mean-backend
     restart: always
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
     environment:
-      - MONGO_URI=mongodb://mongo:27017/dd-db
-      - PORT=3000
+      MONGO_URI: "mongodb://mongo:27017/dd-db"
+      PORT: "3000"
+      # If mongo uses auth: "mongodb://root:examplepassword@mongo:27017/dd-db?authSource=admin"
     ports:
       - "3000:3000"
     networks:
       - mean-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
   frontend:
     build: ./frontend
@@ -36,7 +54,7 @@ services:
     networks:
       - mean-network
     ports:
-      - "8080:80" # optional mapping; nginx will serve on 80 externally
+      - "8080:80" # optional; nginx will reverse-proxy on 80, this is for direct access if needed
 
   nginx:
     image: nginx:stable-alpine
