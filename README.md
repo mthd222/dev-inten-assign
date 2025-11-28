@@ -65,7 +65,9 @@ The `docker-compose.yml` spins up:
 - Nginx reverse proxy (serves frontend + backend) 
 
 To run locally:
+```bash
 docker compose up -d --build
+```
 
 Access website:
 http://localhost/
