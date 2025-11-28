@@ -15,30 +15,30 @@ The entire stack runs using Docker Compose, and GitHub Actions automates build �
 
 # 📁 Project Structure
 
+```text
 crud-dd-task-mean-app/
 │
-├── backend/ # Node.js + Express API
-│ ├── Dockerfile
-│ ├── package.json
-│ ├── server.js
-│ └── ...
-│
-├── frontend/ # Angular application
-│ ├── Dockerfile
-│ ├── package.json
-│ ├── src/
-│ └── ...
-│
-├── nginx/
-│ ├── default.conf # Reverse proxy config
-│
-├── docker-compose.yml # Full stack deployment
-│
 ├── .github/
-│ └── workflows/
-│ └── ci-cd.yml # GitHub Actions pipeline
+│   └── workflows/
+│       └── ci-cd.yml          # GitHub Actions pipeline configuration
 │
-├── README.md # Documentation (this file)
+├── backend/                   # Node.js + Express API
+│   ├── Dockerfile             # Backend container definition
+│   ├── package.json           # Backend dependencies
+│   ├── server.js              # Entry point for the API
+│   └── ...
+│
+├── frontend/                  # Angular application
+│   ├── Dockerfile             # Frontend container definition (Multi-stage)
+│   ├── package.json           # Frontend dependencies
+│   ├── src/                   # Source code
+│   └── ...
+│
+├── nginx/                     # Reverse Proxy Configuration
+│   └── default.conf           # Nginx routing rules
+│
+├── docker-compose.yml         # Orchestrates Backend, Frontend, and Database
+└── README.md                  # Project documentation
 
 # Docker Architecture
 
