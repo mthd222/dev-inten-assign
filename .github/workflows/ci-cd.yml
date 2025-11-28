@@ -44,7 +44,7 @@ jobs:
       - name: Deploy to VM via SSH
         uses: appleboy/ssh-action@master
         with:
-          host: "13.127.65.8"
+          host: "13.232.76.119"
           username: ${{ secrets.SSH_USER }}
           port: ${{ secrets.SSH_PORT || '22' }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
