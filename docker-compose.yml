@@ -15,11 +15,12 @@ services:
     ports:
       - "27017:27017"   # remove this in production if you don't want host exposure
     healthcheck:
-      test: ["CMD", "mongo", "--eval", "db.getMongo() && db.getName()"]
+      test: ["CMD-SHELL", "mongosh --quiet --eval \"db.adminCommand({ ping: 1 })\""]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 10s
+
 
   backend:
     build: ./backend
